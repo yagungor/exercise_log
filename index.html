@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TrainLog">
+<meta name="theme-color" content="#0a0a0a">
+<title>TrainLog</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1e1e1e;
+    --surface3: #282828;
+    --border: #2a2a2a;
+    --text: #f0ede8;
+    --text2: #888;
+    --text3: #555;
+    --accent-push: #4a9fc8;
+    --accent-pull: #c8894a;
+    --accent-legs: #6abf5e;
+    --accent-cardio: #c8a84a;
+    --accent-recovery: #6abf9e;
+    --safe-top: env(safe-area-inset-top, 44px);
+    --safe-bottom: env(safe-area-inset-bottom, 20px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+    padding-bottom: calc(80px + var(--safe-bottom));
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    padding: calc(var(--safe-top) + 12px) 20px 14px;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    display: flex; align-items: flex-end; justify-content: space-between;
+  }
+
+  .header-title { font-family: 'DM Serif Display', serif; font-size: 28px; letter-spacing: -0.5px; }
+  .header-sub { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px; }
+  .header-date { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); text-align: right; line-height: 1.5; }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    display: flex;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding-bottom: var(--safe-bottom);
+  }
+
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    gap: 3px; padding: 10px 0; background: none; border: none;
+    color: var(--text3); cursor: pointer; transition: color 0.2s;
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .nav-btn.active { color: var(--text); }
+  .nav-icon { font-size: 20px; line-height: 1; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; padding: 0 16px; }
+  .screen.active { display: block; }
+
+  /* ── WEEK STRIP ── */
+  .week-strip {
+    display: flex; gap: 8px; overflow-x: auto; padding: 0 0 16px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .week-strip::-webkit-scrollbar { display: none; }
+
+  .day-pill {
+    flex-shrink: 0; display: flex; flex-direction: column; align-items: center;
+    gap: 6px; padding: 12px 14px; border-radius: 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s; min-width: 64px;
+  }
+  .day-pill.active { border-color: var(--text); background: var(--surface2); }
+  .day-pill-short { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text3); letter-spacing: 0.1em; }
+  .day-pill-icon { font-size: 22px; line-height: 1; }
+  .day-pill-type { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.05em; }
+  .day-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text3); opacity: 0; transition: opacity 0.2s; }
+  .day-pill-dot.logged { opacity: 1; }
+
+  /* ── WORKOUT CARD ── */
+  .workout-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; overflow: hidden; margin-bottom: 12px;
+  }
+  .workout-card-header {
+    padding: 16px 18px 14px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .card-icon-wrap {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .card-meta { flex: 1; }
+  .card-label { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text); }
+  .card-sublabel { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .card-badge {
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em;
+    padding: 3px 8px; border-radius: 6px; text-transform: uppercase;
+  }
+
+  /* ── EXERCISE ROWS ── */
+  .exercise-list { border-top: 1px solid var(--border); }
+
+  .exercise-row {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .exercise-row:last-child { border-bottom: none; }
+
+  .exercise-header { display: flex; align-items: center; gap: 10px; }
+  .ex-num {
+    width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); flex-shrink: 0;
+  }
+  .ex-name { font-size: 14px; font-weight: 500; flex: 1; }
+  .ex-target {
+    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2);
+    background: var(--surface2); padding: 3px 8px; border-radius: 6px;
+  }
+  .ex-logged-indicator { font-size: 14px; }
+
+  /* ── LOG PANEL ── */
+  .log-panel {
+    display: none; padding: 14px 18px 16px;
+    background: var(--surface2); border-top: 1px solid var(--border);
+  }
+  .log-panel.open { display: block; }
+
+  .set-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .set-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); width: 36px; }
+
+  .log-input {
+    flex: 1; background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text); border-radius: 10px; padding: 10px 12px;
+    font-family: 'DM Mono', monospace; font-size: 14px; text-align: center;
+    outline: none; -webkit-appearance: none;
+  }
+  .log-input:focus { border-color: var(--text2); }
+  .log-input::placeholder { color: var(--text3); }
+  .input-unit { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); }
+
+  .add-set-btn {
+    width: 100%; margin-top: 4px; padding: 10px;
+    background: none; border: 1px dashed var(--border);
+    color: var(--text3); border-radius: 10px; cursor: pointer;
+    font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em;
+    transition: all 0.2s;
+  }
+  .add-set-btn:active { background: var(--surface3); }
+
+  .save-set-btn {
+    width: 100%; margin-top: 12px; padding: 13px;
+    background: var(--text); color: var(--bg);
+    border: none; border-radius: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    transition: opacity 0.2s;
+  }
+  .save-set-btn:active { opacity: 0.8; }
+
+  .prev-log {
+    margin-top: 12px; padding: 10px 12px;
+    background: var(--surface3); border-radius: 10px;
+    border-left: 2px solid var(--text3);
+  }
+  .prev-log-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .prev-log-sets { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text2); line-height: 1.8; }
+
+  /* ── HISTORY SCREEN ── */
+  .history-section-label {
+    font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3);
+    letter-spacing: 0.1em; text-transform: uppercase; margin: 20px 0 10px;
+  }
+
+  .history-entry {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .history-entry-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .history-entry-title { font-family: 'DM Serif Display', serif; font-size: 15px; }
+  .history-entry-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); }
+  .history-exercise-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .history-exercise-row:last-child { border-bottom: none; }
+  .history-ex-name { font-size: 12px; color: var(--text2); }
+  .history-ex-sets { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text); }
+
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    font-size: 13px; color: var(--text3); line-height: 2;
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* ── PROGRESS SCREEN ── */
+  .progress-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; margin-bottom: 12px;
+  }
+  .progress-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .progress-ex-name { font-family: 'DM Serif Display', serif; font-size: 15px; }
+  .progress-select {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 6px 10px;
+    font-family: 'DM Mono', monospace; font-size: 11px; width: 100%; margin-bottom: 14px;
+    outline: none;
+  }
+
+  .mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 60px; margin-top: 8px; }
+  .mini-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .mini-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.4s ease; }
+  .mini-bar-label { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--text3); }
+
+  .pr-banner {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2); border-radius: 10px; padding: 10px 14px; margin-top: 10px;
+  }
+  .pr-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; }
+  .pr-value { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); }
+  .pr-unit { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); }
+
+  /* ── CARDIO LOG ── */
+  .cardio-log-form { padding: 14px 18px 16px; border-top: 1px solid var(--border); background: var(--surface2); display: none; }
+  .cardio-log-form.open { display: block; }
+  .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .form-group { flex: 1; }
+  .form-group label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+
+  /* ── INSTALL BANNER ── */
+  .install-banner {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .install-icon { font-size: 28px; flex-shrink: 0; }
+  .install-text { flex: 1; font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .install-text strong { color: var(--text); }
+  .install-dismiss { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 4px; }
+
+  .chevron { display: inline-block; transition: transform 0.25s ease; font-style: normal; }
+  .chevron.open { transform: rotate(180deg); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="header-title">TrainLog</div>
+    <div class="header-sub">Body Recomposition</div>
+  </div>
+  <div class="header-date" id="headerDate"></div>
+</div>
+
+<!-- SCREENS -->
+
+<!-- ── TODAY ── -->
+<div class="screen active" id="screen-today">
+  <div id="installBanner" class="install-banner">
+    <div class="install-icon">📲</div>
+    <div class="install-text">
+      <strong>Add to Home Screen</strong><br>
+      Tap the Share button in Safari → "Add to Home Screen" to use as an app
+    </div>
+    <button class="install-dismiss" onclick="dismissBanner()">×</button>
+  </div>
+
+  <div class="week-strip" id="weekStrip"></div>
+  <div id="dayContent"></div>
+</div>
+
+<!-- ── HISTORY ── -->
+<div class="screen" id="screen-history">
+  <div class="history-section-label" style="margin-top:8px">All Sessions</div>
+  <div id="historyList"></div>
+</div>
+
+<!-- ── PROGRESS ── -->
+<div class="screen" id="screen-progress">
+  <div class="history-section-label" style="margin-top:8px">Exercise</div>
+  <select class="progress-select" id="progressSelect" onchange="renderProgress()"></select>
+  <div id="progressContent"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="switchTab('today')" id="nav-today">
+    <span class="nav-icon">🗓</span>Today
+  </button>
+  <button class="nav-btn" onclick="switchTab('history')" id="nav-history">
+    <span class="nav-icon">📋</span>History
+  </button>
+  <button class="nav-btn" onclick="switchTab('progress')" id="nav-progress">
+    <span class="nav-icon">📈</span>Progress
+  </button>
+</nav>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+
+const WEEK = [
+  {
+    short: 'MON', day: 'Monday', type: 'strength', icon: '🏋️',
+    label: 'Day A — Push', sublabel: 'Chest · Shoulders · Triceps',
+    accent: '#4a9fc8', accentBg: '#4a9fc820',
+    badge: 'Strength', badgeColor: '#4a9fc8',
+    exercises: [
+      { name: 'Barbell Bench Press', target: '4 × 5–6', equipment: 'Barbell' },
+      { name: 'Landmine Press', target: '3 × 8–10 each', equipment: 'Landmine' },
+      { name: 'Cable Chest Fly', target: '3 × 12–15', equipment: 'Cable' },
+      { name: 'Cable Lateral Raise', target: '3 × 12–15 each', equipment: 'Cable' },
+      { name: 'Cable Tricep Pushdown', target: '3 × 12–15', equipment: 'Cable' },
+    ]
+  },
+  {
+    short: 'TUE', day: 'Tuesday', type: 'cardio', icon: '🚴',
+    label: 'Peloton — Zone 2', sublabel: '45 min · Low Impact',
+    accent: '#c8a84a', accentBg: '#c8a84a20',
+    badge: 'Cardio', badgeColor: '#c8a84a',
+    cardioFields: [
+      { key: 'duration', label: 'Duration (min)', placeholder: '45' },
+      { key: 'output', label: 'Output (kJ)', placeholder: '—' },
+      { key: 'avgHR', label: 'Avg HR', placeholder: '—' },
+      { key: 'notes', label: 'Notes', placeholder: 'Class name, how it felt…' },
+    ]
+  },
+  {
+    short: 'WED', day: 'Wednesday', type: 'strength', icon: '🏋️',
+    label: 'Day B — Pull', sublabel: 'Back · Biceps · Rear Delts',
+    accent: '#c8894a', accentBg: '#c8894a20',
+    badge: 'Strength', badgeColor: '#c8894a',
+    exercises: [
+      { name: 'Barbell Row', target: '4 × 5–6', equipment: 'Barbell' },
+      { name: 'Landmine Single-Arm Row', target: '3 × 8–10 each', equipment: 'Landmine' },
+      { name: 'Cable Face Pull', target: '3 × 15–20', equipment: 'Cable' },
+      { name: 'Cable Curl', target: '3 × 12–15', equipment: 'Cable' },
+      { name: 'Kettlebell Swing', target: '3 × 15', equipment: 'Kettlebell' },
+    ]
+  },
+  {
+    short: 'THU', day: 'Thursday', type: 'recovery', icon: '🧘',
+    label: 'Active Recovery', sublabel: 'Mobility · Light movement',
+    accent: '#6abf9e', accentBg: '#6abf9e20',
+    badge: 'Recovery', badgeColor: '#6abf9e',
+    cardioFields: [
+      { key: 'activity', label: 'Activity', placeholder: 'Walk, yoga, easy row…' },
+      { key: 'duration', label: 'Duration (min)', placeholder: '20' },
+      { key: 'notes', label: 'Notes', placeholder: 'How do you feel?' },
+    ]
+  },
+  {
+    short: 'FRI', day: 'Friday', type: 'strength', icon: '🏋️',
+    label: 'Day C — Legs + Core', sublabel: 'Legs · Core · Stability',
+    accent: '#6abf5e', accentBg: '#6abf5e20',
+    badge: 'Strength', badgeColor: '#6abf5e',
+    exercises: [
+      { name: 'Barbell Back Squat', target: '4 × 5–6', equipment: 'Barbell' },
+      { name: 'Romanian Deadlift', target: '3 × 8–10', equipment: 'Barbell' },
+      { name: 'Cable Pull-Through', target: '3 × 12–15', equipment: 'Cable' },
+      { name: 'Cable Woodchop', target: '3 × 10–12 each', equipment: 'Cable' },
+      { name: 'Landmine Anti-Rotation Press', target: '3 × 10 each', equipment: 'Landmine' },
+    ]
+  },
+  {
+    short: 'SAT', day: 'Saturday', type: 'cardio', icon: '🚣',
+    label: 'Rowing — Intervals', sublabel: '30–35 min · Full body',
+    accent: '#9e7ac8', accentBg: '#9e7ac820',
+    badge: 'Cardio', badgeColor: '#9e7ac8',
+    cardioFields: [
+      { key: 'duration', label: 'Duration (min)', placeholder: '32' },
+      { key: 'distance', label: 'Distance (m)', placeholder: '—' },
+      { key: 'avgSplit', label: 'Avg Split /500m', placeholder: '2:10' },
+      { key: 'avgHR', label: 'Avg HR', placeholder: '—' },
+      { key: 'notes', label: 'Notes', placeholder: 'Intervals completed, notes…' },
+    ]
+  },
+  {
+    short: 'SUN', day: 'Sunday', type: 'rest', icon: '😴',
+    label: 'Full Rest Day', sublabel: 'Sleep · Eat well · Recover',
+    accent: '#555', accentBg: '#55555520',
+    badge: 'Rest', badgeColor: '#555',
+  },
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+
+let selectedDayIdx = new Date().getDay(); // 0=Sun
+// Map JS day (0=Sun) to our array (0=Mon)
+const jsDayToIdx = (d) => d === 0 ? 6 : d - 1;
+selectedDayIdx = jsDayToIdx(new Date().getDay());
+
+let openExercise = null; // key = "dayIdx-exIdx"
+let setInputs = {}; // key = "dayIdx-exIdx" => [{weight, reps}]
+let openCardio = null; // dayIdx
+
+// ─── STORAGE ─────────────────────────────────────────────────────────────────
+
+const STORE_KEY = 'trainlog_v1';
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+
+function getSessionKey(dayIdx, date) {
+  return `${dayIdx}_${date}`;
+}
+
+function getTodayDate() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+// ─── HEADER DATE ─────────────────────────────────────────────────────────────
+
+function updateHeaderDate() {
+  const now = new Date();
+  const opts = { weekday: 'short', day: 'numeric', month: 'short' };
+  document.getElementById('headerDate').innerHTML =
+    now.toLocaleDateString('en-GB', opts) + '<br>' +
+    now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+}
+updateHeaderDate();
+setInterval(updateHeaderDate, 30000);
+
+// ─── INSTALL BANNER ──────────────────────────────────────────────────────────
+
+function dismissBanner() {
+  document.getElementById('installBanner').style.display = 'none';
+  localStorage.setItem('bannerDismissed', '1');
+}
+if (localStorage.getItem('bannerDismissed') || navigator.standalone) {
+  document.getElementById('installBanner').style.display = 'none';
+}
+
+// ─── TAB SWITCHING ────────────────────────────────────────────────────────────
+
+function switchTab(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+  if (tab === 'history') renderHistory();
+  if (tab === 'progress') renderProgressInit();
+}
+
+// ─── WEEK STRIP ───────────────────────────────────────────────────────────────
+
+function renderWeekStrip() {
+  const data = loadData();
+  const today = getTodayDate();
+  const strip = document.getElementById('weekStrip');
+  strip.innerHTML = WEEK.map((d, i) => {
+    const hasLog = Object.keys(data).some(k => k.startsWith(i + '_'));
+    return `
+      <div class="day-pill ${i === selectedDayIdx ? 'active' : ''}" onclick="selectDay(${i})" style="border-color: ${i === selectedDayIdx ? d.accent : ''}">
+        <span class="day-pill-short">${d.short}</span>
+        <span class="day-pill-icon">${d.icon}</span>
+        <span class="day-pill-type" style="color:${d.accent}">${d.badge}</span>
+        <div class="day-pill-dot ${hasLog ? 'logged' : ''}" style="background:${d.accent}"></div>
+      </div>`;
+  }).join('');
+}
+
+function selectDay(idx) {
+  selectedDayIdx = idx;
+  openExercise = null;
+  openCardio = null;
+  setInputs = {};
+  renderWeekStrip();
+  renderDayContent();
+}
+
+// ─── DAY CONTENT ──────────────────────────────────────────────────────────────
+
+function renderDayContent() {
+  const d = WEEK[selectedDayIdx];
+  const container = document.getElementById('dayContent');
+
+  if (d.type === 'rest') {
+    container.innerHTML = `
+      <div class="workout-card">
+        <div class="workout-card-header">
+          <div class="card-icon-wrap" style="background:${d.accentBg}"><span>${d.icon}</span></div>
+          <div class="card-meta">
+            <div class="card-label">${d.label}</div>
+            <div class="card-sublabel">${d.sublabel}</div>
+          </div>
+          <span class="card-badge" style="background:${d.accentBg};color:${d.accent}">${d.badge}</span>
+        </div>
+        <div style="padding:0 18px 18px;font-size:13px;color:var(--text2);line-height:1.7">
+          Rest, recover, sleep 7–9 hours. Eat at your protein target. Recomp happens here.
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (d.type === 'strength') {
+    renderStrengthDay(d, container);
+  } else {
+    renderCardioDay(d, container);
+  }
+}
+
+function renderStrengthDay(d, container) {
+  const data = loadData();
+  const today = getTodayDate();
+
+  const exRows = d.exercises.map((ex, ei) => {
+    const key = `${selectedDayIdx}-${ei}`;
+    const isOpen = openExercise === key;
+
+    // Find previous log
+    const prevEntry = findPrevLog(selectedDayIdx, ex.name, today);
+    const todayEntry = getTodayLog(selectedDayIdx, ex.name, today, data);
+    const hasLog = todayEntry && todayEntry.sets && todayEntry.sets.length > 0;
+
+    let logPanel = '';
+    if (isOpen) {
+      const currentSets = setInputs[key] || (todayEntry?.sets ? [...todayEntry.sets] : [{ weight: '', reps: '' }]);
+      setInputs[key] = currentSets;
+
+      const setRows = currentSets.map((s, si) => `
+        <div class="set-row">
+          <span class="set-label">Set ${si + 1}</span>
+          <input class="log-input" type="number" inputmode="decimal" placeholder="kg" value="${s.weight}"
+            oninput="updateSet(${selectedDayIdx},${ei},${si},'weight',this.value)" style="max-width:80px">
+          <span class="input-unit">kg</span>
+          <input class="log-input" type="number" inputmode="numeric" placeholder="reps" value="${s.reps}"
+            oninput="updateSet(${selectedDayIdx},${ei},${si},'reps',this.value)" style="max-width:80px">
+          <span class="input-unit">reps</span>
+        </div>`).join('');
+
+      const prevHtml = prevEntry ? `
+        <div class="prev-log">
+          <div class="prev-log-label">Previous · ${formatDate(prevEntry.date)}</div>
+          <div class="prev-log-sets">${prevEntry.sets.map(s => `${s.weight}kg × ${s.reps}`).join(' · ')}</div>
+        </div>` : '';
+
+      logPanel = `
+        <div class="log-panel open">
+          ${setRows}
+          <button class="add-set-btn" onclick="addSet(${selectedDayIdx},${ei})">+ Add set</button>
+          <button class="save-set-btn" onclick="saveExercise(${selectedDayIdx},${ei})">Save</button>
+          ${prevHtml}
+        </div>`;
+    }
+
+    return `
+      <div class="exercise-row" onclick="toggleExercise(${selectedDayIdx},${ei})">
+        <div class="exercise-header">
+          <div class="ex-num">${ei + 1}</div>
+          <div class="ex-name">${ex.name}</div>
+          <span class="ex-target">${ex.target}</span>
+          <span class="ex-logged-indicator">${hasLog ? '✅' : ''}</span>
+          <span class="chevron ${isOpen ? 'open' : ''}">›</span>
+        </div>
+      </div>
+      ${logPanel}`;
+  }).join('');
+
+  const loggedCount = d.exercises.filter((ex, ei) => {
+    const todayEntry = getTodayLog(selectedDayIdx, ex.name, today, data);
+    return todayEntry?.sets?.length > 0;
+  }).length;
+
+  container.innerHTML = `
+    <div class="workout-card">
+      <div class="workout-card-header">
+        <div class="card-icon-wrap" style="background:${d.accentBg}">${d.icon}</div>
+        <div class="card-meta">
+          <div class="card-label">${d.label}</div>
+          <div class="card-sublabel">${d.sublabel}</div>
+          <div style="margin-top:6px;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3)">
+            ${loggedCount}/${d.exercises.length} logged today
+          </div>
+        </div>
+        <span class="card-badge" style="background:${d.accentBg};color:${d.accent}">${d.badge}</span>
+      </div>
+      <div class="exercise-list">${exRows}</div>
+    </div>`;
+}
+
+function renderCardioDay(d, container) {
+  const data = loadData();
+  const today = getTodayDate();
+  const sessionKey = getSessionKey(selectedDayIdx, today);
+  const existing = data[sessionKey]?.cardio || {};
+  const isOpen = openCardio === selectedDayIdx;
+
+  const fields = (d.cardioFields || []).map(f => `
+    <div class="form-group" style="flex:${f.key==='notes'?'unset':'1'};width:${f.key==='notes'?'100%':'auto'}">
+      <label>${f.label}</label>
+      <input class="log-input" type="text" inputmode="${f.key==='notes'?'text':'decimal'}"
+        placeholder="${f.placeholder}" value="${existing[f.key]||''}"
+        id="cardio_${selectedDayIdx}_${f.key}"
+        style="width:100%;text-align:left;padding:10px 12px">
+    </div>`).join('');
+
+  // Group fields in rows of 2
+  const fieldGroups = [];
+  const cf = d.cardioFields || [];
+  for (let i = 0; i < cf.length; i += 2) {
+    if (cf[i+1] && cf[i].key !== 'notes' && cf[i+1].key !== 'notes') {
+      fieldGroups.push(`<div class="form-row">${renderField(cf[i], selectedDayIdx, existing)}${renderField(cf[i+1], selectedDayIdx, existing)}</div>`);
+    } else {
+      fieldGroups.push(`<div style="margin-bottom:10px">${renderField(cf[i], selectedDayIdx, existing)}</div>`);
+      if (cf[i+1]) fieldGroups.push(`<div style="margin-bottom:10px">${renderField(cf[i+1], selectedDayIdx, existing)}</div>`);
+    }
+  }
+
+  const hasLog = Object.keys(existing).some(k => existing[k]);
+
+  const prevCardio = findPrevCardioLog(selectedDayIdx, today, data);
+  const prevHtml = prevCardio ? `
+    <div class="prev-log" style="margin-top:12px">
+      <div class="prev-log-label">Previous · ${formatDate(prevCardio.date)}</div>
+      <div class="prev-log-sets">${Object.entries(prevCardio.cardio).filter(([k,v])=>v).map(([k,v])=>`${k}: ${v}`).join(' · ')}</div>
+    </div>` : '';
+
+  container.innerHTML = `
+    <div class="workout-card">
+      <div class="workout-card-header" onclick="toggleCardio(${selectedDayIdx})" style="cursor:pointer">
+        <div class="card-icon-wrap" style="background:${d.accentBg}">${d.icon}</div>
+        <div class="card-meta">
+          <div class="card-label">${d.label}</div>
+          <div class="card-sublabel">${d.sublabel}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span>${hasLog ? '✅' : ''}</span>
+          <span class="card-badge" style="background:${d.accentBg};color:${d.accent}">${d.badge}</span>
+          <span class="chevron ${isOpen?'open':''}">›</span>
+        </div>
+      </div>
+      <div class="cardio-log-form ${isOpen?'open':''}">
+        ${fieldGroups.join('')}
+        <button class="save-set-btn" onclick="saveCardio(${selectedDayIdx})">Save Session</button>
+        ${prevHtml}
+      </div>
+    </div>`;
+}
+
+function renderField(f, dayIdx, existing) {
+  return `
+    <div class="form-group">
+      <label>${f.label}</label>
+      <input class="log-input" type="${f.key==='notes'||f.key==='activity'||f.key==='avgSplit'?'text':'number'}"
+        inputmode="${f.key==='notes'||f.key==='activity'||f.key==='avgSplit'?'text':'decimal'}"
+        placeholder="${f.placeholder}" value="${existing[f.key]||''}"
+        id="cardio_${dayIdx}_${f.key}"
+        style="width:100%;text-align:left;padding:10px 12px">
+    </div>`;
+}
+
+// ─── INTERACTIONS ─────────────────────────────────────────────────────────────
+
+function toggleExercise(dayIdx, exIdx) {
+  const key = `${dayIdx}-${exIdx}`;
+  openExercise = openExercise === key ? null : key;
+  renderDayContent();
+  if (openExercise === key) {
+    setTimeout(() => {
+      const rows = document.querySelectorAll('.exercise-row');
+      if (rows[exIdx]) rows[exIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+  }
+}
+
+function toggleCardio(dayIdx) {
+  openCardio = openCardio === dayIdx ? null : dayIdx;
+  renderDayContent();
+}
+
+function updateSet(dayIdx, exIdx, setIdx, field, value) {
+  const key = `${dayIdx}-${exIdx}`;
+  if (!setInputs[key]) setInputs[key] = [{ weight: '', reps: '' }];
+  setInputs[key][setIdx][field] = value;
+}
+
+function addSet(dayIdx, exIdx) {
+  const key = `${dayIdx}-${exIdx}`;
+  if (!setInputs[key]) setInputs[key] = [];
+  setInputs[key].push({ weight: '', reps: '' });
+  renderDayContent();
+}
+
+function saveExercise(dayIdx, exIdx) {
+  const key = `${dayIdx}-${exIdx}`;
+  const sets = (setInputs[key] || []).filter(s => s.weight || s.reps);
+  if (!sets.length) { alert('Enter at least one set before saving.'); return; }
+
+  const data = loadData();
+  const today = getTodayDate();
+  const sessionKey = getSessionKey(dayIdx, today);
+  if (!data[sessionKey]) data[sessionKey] = { date: today, dayIdx, exercises: {} };
+
+  const exName = WEEK[dayIdx].exercises[exIdx].name;
+  data[sessionKey].exercises[exName] = { sets, savedAt: new Date().toISOString() };
+  saveData(data);
+
+  openExercise = null;
+  setInputs = {};
+  renderWeekStrip();
+  renderDayContent();
+}
+
+function saveCardio(dayIdx) {
+  const d = WEEK[dayIdx];
+  const cardioData = {};
+  (d.cardioFields || []).forEach(f => {
+    const el = document.getElementById(`cardio_${dayIdx}_${f.key}`);
+    if (el && el.value) cardioData[f.key] = el.value;
+  });
+
+  if (!Object.keys(cardioData).length) { alert('Enter at least one field before saving.'); return; }
+
+  const data = loadData();
+  const today = getTodayDate();
+  const sessionKey = getSessionKey(dayIdx, today);
+  if (!data[sessionKey]) data[sessionKey] = { date: today, dayIdx };
+  data[sessionKey].cardio = cardioData;
+  saveData(data);
+
+  openCardio = null;
+  renderWeekStrip();
+  renderDayContent();
+}
+
+// ─── DATA HELPERS ─────────────────────────────────────────────────────────────
+
+function getTodayLog(dayIdx, exName, today, data) {
+  const sessionKey = getSessionKey(dayIdx, today);
+  return data[sessionKey]?.exercises?.[exName] || null;
+}
+
+function findPrevLog(dayIdx, exName, today) {
+  const data = loadData();
+  const sessions = Object.values(data)
+    .filter(s => s.dayIdx === dayIdx && s.date < today && s.exercises?.[exName]?.sets?.length)
+    .sort((a, b) => b.date.localeCompare(a.date));
+  if (!sessions.length) return null;
+  return { date: sessions[0].date, sets: sessions[0].exercises[exName].sets };
+}
+
+function findPrevCardioLog(dayIdx, today, data) {
+  const sessions = Object.values(data)
+    .filter(s => s.dayIdx === dayIdx && s.date < today && s.cardio)
+    .sort((a, b) => b.date.localeCompare(a.date));
+  return sessions[0] || null;
+}
+
+// ─── HISTORY ─────────────────────────────────────────────────────────────────
+
+function renderHistory() {
+  const data = loadData();
+  const container = document.getElementById('historyList');
+
+  const sessions = Object.values(data).sort((a, b) => b.date.localeCompare(a.date));
+
+  if (!sessions.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div>No sessions logged yet.<br>Start today to build your history.</div>`;
+    return;
+  }
+
+  container.innerHTML = sessions.map(s => {
+    const d = WEEK[s.dayIdx];
+    if (!d) return '';
+    const isStrength = d.type === 'strength';
+    const exRows = isStrength && s.exercises
+      ? Object.entries(s.exercises).map(([name, log]) => `
+          <div class="history-exercise-row">
+            <span class="history-ex-name">${name}</span>
+            <span class="history-ex-sets">${log.sets.map(set => `${set.weight}kg×${set.reps}`).join(' · ')}</span>
+          </div>`).join('')
+      : s.cardio
+        ? Object.entries(s.cardio).map(([k, v]) => `
+          <div class="history-exercise-row">
+            <span class="history-ex-name">${k}</span>
+            <span class="history-ex-sets">${v}</span>
+          </div>`).join('')
+        : '';
+
+    return `
+      <div class="history-entry">
+        <div class="history-entry-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px">${d.icon}</span>
+            <div class="history-entry-title">${d.label}</div>
+          </div>
+          <div class="history-entry-date">${formatDate(s.date)}</div>
+        </div>
+        ${exRows}
+      </div>`;
+  }).join('');
+}
+
+// ─── PROGRESS ────────────────────────────────────────────────────────────────
+
+function renderProgressInit() {
+  const allExercises = WEEK.filter(d => d.type === 'strength').flatMap(d => d.exercises.map(e => e.name));
+  const unique = [...new Set(allExercises)];
+  const sel = document.getElementById('progressSelect');
+  sel.innerHTML = unique.map(n => `<option value="${n}">${n}</option>`).join('');
+  renderProgress();
+}
+
+function renderProgress() {
+  const exName = document.getElementById('progressSelect').value;
+  const data = loadData();
+
+  const entries = Object.values(data)
+    .filter(s => s.exercises?.[exName]?.sets?.length)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const container = document.getElementById('progressContent');
+
+  if (entries.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📈</div>No data yet for<br><strong>${exName}</strong><br>Log some sessions first.</div>`;
+    return;
+  }
+
+  // Best set per session (heaviest weight)
+  const points = entries.map(s => {
+    const sets = s.exercises[exName].sets;
+    const best = sets.reduce((max, set) => parseFloat(set.weight) > parseFloat(max.weight) ? set : max, sets[0]);
+    return { date: s.date, weight: parseFloat(best.weight) || 0, reps: best.reps };
+  });
+
+  const maxW = Math.max(...points.map(p => p.weight));
+  const pr = points.reduce((best, p) => p.weight > best.weight ? p : best, points[0]);
+
+  // Find day for accent colour
+  const dayData = WEEK.find(d => d.exercises?.some(e => e.name === exName));
+  const accent = dayData?.accent || '#4a9fc8';
+
+  const bars = points.slice(-8).map(p => {
+    const height = maxW > 0 ? Math.max(8, (p.weight / maxW) * 52) : 8;
+    const label = p.date.slice(5); // MM-DD
+    return `
+      <div class="mini-bar-wrap">
+        <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--text2);margin-bottom:2px">${p.weight}kg</div>
+        <div class="mini-bar" style="height:${height}px;background:${accent}"></div>
+        <div class="mini-bar-label">${label}</div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="progress-card">
+      <div class="pr-banner">
+        <div>
+          <div class="pr-label">Personal Best</div>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <div class="pr-value">${pr.weight}</div>
+            <div class="pr-unit">kg × ${pr.reps} reps · ${formatDate(pr.date)}</div>
+          </div>
+        </div>
+        <span style="font-size:28px">🏆</span>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px">
+          Top weight per session (last 8)
+        </div>
+        <div class="mini-chart">${bars}</div>
+      </div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);text-align:center;margin-top:8px">
+      ${entries.length} session${entries.length!==1?'s':''} logged
+    </div>`;
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+renderWeekStrip();
+renderDayContent();
+
+// ─── SERVICE WORKER ───────────────────────────────────────────────────────────
+
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'trainlog-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k!==CACHE).map(k => caches.delete(k)))));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+</script>
+</body>
+</html>
