@@ -172,6 +172,19 @@ nav{
 nav button{padding:6px 1px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--faint);font-size:10.5px;font-weight:600;letter-spacing:-.1px}
 nav button[aria-pressed="true"]{color:var(--accent)}
 nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+details.excues{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px;overflow:hidden}
+details.excues summary{padding:11px 13px;font-weight:600;font-size:14.5px;list-style:none;display:flex;align-items:center;gap:9px;cursor:pointer}
+details.excues summary::-webkit-details-marker{display:none}
+details.excues summary::after{content:"";flex:0 0 auto;width:7px;height:7px;border-right:2px solid var(--faint);border-bottom:2px solid var(--faint);transform:rotate(45deg) translateY(-2px);transition:transform .2s}
+details.excues[open] summary::after{transform:rotate(-135deg) translateY(-1px)}
+.sumvals{flex:1;text-align:right;font-size:13px;color:var(--muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.excues .inner{padding:0 13px 13px;border-top:1px solid var(--line);padding-top:12px}
+.excues .note{margin-bottom:12px}
+.excues .setup{margin-bottom:0}
+.excues .chip{background:var(--surface)}
+.cuelist{margin-top:12px}
+.cuelist li{list-style:none;font-size:14.5px;color:#2C363B;padding:5px 0 5px 15px;position:relative;line-height:1.5}
+.cuelist li::before{content:"";position:absolute;left:0;top:13px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
 .mob-head{display:flex;align-items:stretch}
 .tick{flex:0 0 46px;display:flex;align-items:flex-start;justify-content:center;padding:15px 0 0}
 .tick i{width:22px;height:22px;border-radius:50%;border:1.8px solid var(--line);display:block;position:relative}
@@ -227,34 +240,27 @@ const BENCH_ANGLES = [-8,0,10,20,30,37.5,45,52.5,60,67.5,75,85];
 const PLAN = {
   A:{ key:"A", name:"Lower + Core", sub:"Hips, hamstrings, trunk", color:"var(--A)",
     tips:[
-      {h:"Before you start", l:[
-        "Five minutes: 90/90 hip switches, glute bridges, banded lateral walks.",
-        "Right hip gets more time than the left until the gap closes."]},
-      {h:"The two lifts that matter", l:[
-        "Hip thrust: bench flat at 0, long edge across your shoulder blades. Ribs down, chin tucked, finish with glutes not lower back.",
-        "RDL: start lighter than feels right. Hinge to mid-shin, neutral spine, push the hips back rather than bending down.",
-        "Brace before every rep on both. This is the day bracing matters most."]},
-      {h:"Housekeeping", l:[
-        "Superset the hip abduction with dead bugs to save time.",
-        "Barefoot for the calf and tibialis work.",
-        "Any back symptom: stop the session. Do not push through it."]}
+      {h:"Warm-up, five minutes", l:[
+        "90/90 hip switches, glute bridges, banded lateral walks.",
+        "Right hip gets more time than the left until the gap closes.",
+        "One light set of hip thrusts and one of RDLs before you load them."]}
     ],
     ex:[
-      {id:"a1",n:"Barbell hip thrust",t1:"3 × 10–12",t2:"4 × 8–10",s1:3,s2:4,setup:["bench","bar"],
+      {id:"a1",cues:["Bench flat at 0, long edge across your shoulder blades. Wedge it so it cannot slide.","Set your feet so the shins are vertical at the top of the rep, not at the bottom.","Ribs down and chin tucked before you lift. Eyes forward, never up.","Drive through the heels and finish with the glutes. Two second squeeze at lockout.","Feeling it in the lower back means the ribs flared. Stop the set and reset."],n:"Barbell hip thrust",t1:"3 × 10–12",t2:"4 × 8–10",s1:3,s2:4,setup:["bench","bar"],
         note:"Bench flat (0). Bar across the hips, pad on. Full lockout, two second squeeze."},
-      {id:"a2",n:"Front-foot-elevated split squat",t1:"3 × 10 / side",t2:"3 × 8–10 / side",s1:3,s2:3,setup:[],side:true,
+      {id:"a2",cues:["Front foot on a 4 to 6 inch plate stack, rear foot flat on the floor behind you.","Slight forward lean of the torso. That is intentional and shifts the work to the hip.","Front knee tracks over the second and third toes. Do not let it drift inward.","Dumbbells at your sides, three second descent.","Your weaker side sets the rep count. Start with the right."],n:"Front-foot-elevated split squat",t1:"3 × 10 / side",t2:"3 × 8–10 / side",s1:3,s2:3,setup:[],side:true,
         note:"Front foot on a 4–6 inch plate stack. Slight forward torso lean. Dumbbells at your sides."},
-      {id:"a3",n:"Romanian deadlift",t1:"3 × 10",t2:"3 × 8–10",s1:3,s2:3,setup:["bar"],
+      {id:"a3",cues:["Start lighter than feels right. This is the highest risk lift in the plan for you.","Brace before the bar leaves the rack. Keep the bar in contact with your thighs the whole way.","Push the hips backward rather than bending down. Soft knees, not bent knees.","Stop at mid shin, or the moment the back would start to round, whichever comes first.","If the brace goes, end the set. Do not grind reps on this one."],n:"Romanian deadlift",t1:"3 × 10",t2:"3 × 8–10",s1:3,s2:3,setup:["bar"],
         note:"Loaded hamstring length beats stretching. Controlled descent, no rounding at the bottom."},
-      {id:"a4",n:"Cable pull-through",t1:"3 × 12–15",t2:"3 × 12–15",s1:3,s2:3,setup:["cable"],
+      {id:"a4",cues:["Low pulley, rope, facing away from the stack with the rope between your legs.","Walk out far enough that there is still tension at the top of the rep.","Hinge back, then drive the hips forward to a tall finish. Squeeze at the top.","Your arms are ropes. If you are pulling with them, the hips are not working."],n:"Cable pull-through",t1:"3 × 12–15",t2:"3 × 12–15",s1:3,s2:3,setup:["cable"],
         note:"Low pulley, rope, facing away. Hinge pattern with no spinal compression."},
-      {id:"a5",n:"Cable hip abduction",t1:"3 × 12–15 / side",t2:"3 × 12–15 / side",s1:3,s2:3,setup:["cable"],side:true,
+      {id:"a5",cues:["Low pulley, ankle strap on the outside leg. Hold the rack lightly for balance.","Stand tall and keep the pelvis level. No leaning away from the stack.","Lift the leg out and slightly behind you, not forward.","Light. If the torso moves, the weight is doing the work instead of the glute."],n:"Cable hip abduction",t1:"3 × 12–15 / side",t2:"3 × 12–15 / side",s1:3,s2:3,setup:["cable"],side:true,
         note:"Low pulley, ankle strap. Glute medius. Stand tall, do not lean away from the stack."},
-      {id:"a6",n:"Dead bug",t1:"3 × 8 / side",t2:"3 × 10 / side",s1:3,s2:3,setup:[],side:true,bw:true,
+      {id:"a6",cues:["Lower back pinned to the floor for the entire set. That is the whole exercise.","Exhale as the opposite arm and leg extend. Ribs stay down.","Extend only as far as you can hold the back flat, then shorten the range next rep.","Progress by slowing the tempo before you add a plate."],n:"Dead bug",t1:"3 × 8 / side",t2:"3 × 10 / side",s1:3,s2:3,setup:[],side:true,bw:true,
         note:"Lower back pinned to the floor throughout. Slow. Progress by tempo, then by holding a light plate."},
-      {id:"a7",n:"Side plank + top-leg raise",t1:"2 × 20–30s / side",t2:"3 × 30–45s / side",s1:2,s2:3,setup:[],unit:"sec",side:true,bw:true,
+      {id:"a7",cues:["Elbow directly under the shoulder. Hips stacked, not rolled backward.","Push the bottom shoulder away from your ear so you are not hanging on the joint.","Raise the top leg without letting the hips drop or rotate.","Drop to the knee for a shorter lever if the hips start sagging."],n:"Side plank + top-leg raise",t1:"2 × 20–30s / side",t2:"3 × 30–45s / side",s1:2,s2:3,setup:[],unit:"sec",side:true,bw:true,
         note:"Hips stacked. Do not sag or rotate backward. Anti-lateral-flexion plus glute medius."},
-      {id:"a8",n:"Calf raise + tibialis raise",t1:"2 × 15–20 each",t2:"2 × 15–20 each",s1:2,s2:2,setup:[],bw:true,
+      {id:"a8",cues:["Barefoot for both. Pause at the top of every rep.","Calf raises off a plate edge so you get the stretch at the bottom.","Tibialis raises with heels against the wall, toes pulling up toward the shins.","Burning is expected. These are small muscles and they fatigue fast."],n:"Calf raise + tibialis raise",t1:"2 × 15–20 each",t2:"2 × 15–20 each",s1:2,s2:2,setup:[],bw:true,
         note:"Barefoot, full range on both. Foot and ankle work for the arch."}
     ],
     min:["a1","a2","a4","a6","a7"]
@@ -262,32 +268,28 @@ const PLAN = {
 
   B:{ key:"B", name:"Upper Pull", sub:"Back, rear delts, trunk", color:"var(--B)",
     tips:[
-      {h:"Before you start", l:[
-        "Two minutes: thoracic extension over the roller, then wall slides."]},
-      {h:"Cues", l:[
-        "Chest-supported row: bench at 30 or 37.5. Pull toward the hip, not the armpit.",
-        "Face pulls earn their keep through volume, not load. Pull to the forehead, rotate out at the end.",
-        "Prone Y raise: very light or nothing. If you feel it in the upper traps, go lighter.",
-        "Pallof press: half kneeling, inside knee down. Resist the twist, do not create one."]},
+      {h:"Warm-up, three minutes", l:[
+        "Thoracic extension over the roller, then wall slides.",
+        "Band pull-aparts until the shoulders feel awake."]},
       {h:"Why this day is pull-heavy", l:[
         "Three pulls to two pushes across the week is deliberate for rounded shoulders. Do not even it out."]}
     ],
     ex:[
-      {id:"b1",n:"Chest-supported dumbbell row",t1:"3 × 10–12",t2:"4 × 8–10",s1:3,s2:4,setup:["bench"],
+      {id:"b1",cues:["Bench at 30 or 37.5. Chest on the pad, forehead clear of it.","Let the shoulder blades travel forward at the bottom and back at the top.","Pull toward the hip, not the armpit. Elbows about 45 degrees from the torso.","Pause a beat at the top. No bouncing off the pad."],n:"Chest-supported dumbbell row",t1:"3 × 10–12",t2:"4 × 8–10",s1:3,s2:4,setup:["bench"],
         note:"Chest on the pad, zero spinal loading. Let the shoulder blades travel."},
-      {id:"b2",n:"Lat pulldown or pull-up",t1:"3 × 8–12",t2:"3 × 8–12",s1:3,s2:3,setup:["cable"],
+      {id:"b2",cues:["High pulley, MAG bar. Anchor the knees so you do not lift off the floor.","Full stretch at the top. Let the shoulders rise before you pull.","Pull the elbows down and into the ribs, chest up.","If pull-ups feel easy, use them instead and add load later."],n:"Lat pulldown or pull-up",t1:"3 × 8–12",t2:"3 × 8–12",s1:3,s2:3,setup:["cable"],
         note:"High pulley, MAG bar. Full stretch at the top. Use pull-ups instead if they are easy."},
-      {id:"b3",n:"Single-arm cable row",t1:"3 × 10–12 / side",t2:"3 × 10 / side",s1:3,s2:3,setup:["cable"],side:true,
+      {id:"b3",cues:["Mid pulley, D-handle, staggered stance, braced.","Reach forward and let the shoulder blade travel, then pull.","No torso rotation. If the ribcage twists, the weight is too heavy.","Keep the free hand off the rack so the trunk has to stabilise."],n:"Single-arm cable row",t1:"3 × 10–12 / side",t2:"3 × 10 / side",s1:3,s2:3,setup:["cable"],side:true,
         note:"Mid pulley, D-handle. Standing and braced. No torso rotation."},
-      {id:"b4",n:"Face pull",t1:"3 × 15–20",t2:"3 × 15–20",s1:3,s2:3,setup:["cable"],
+      {id:"b4",cues:["High pulley, rope, elbows high and wide.","Pull to forehead height, then rotate so the hands finish above the elbows.","This works through volume, not load. Hard by rep 18, never grindy.","Upper traps taking over means lighter and slower."],n:"Face pull",t1:"3 × 15–20",t2:"3 × 15–20",s1:3,s2:3,setup:["cable"],
         note:"High pulley, rope. Elbows high. This is the rounded shoulder work."},
-      {id:"b5",n:"Prone Y raise",t1:"2 × 12–15",t2:"2 × 12–15",s1:2,s2:2,setup:["bench"],
+      {id:"b5",cues:["Bench at 30, face down, forehead just past the top of the pad.","Very light dumbbells, or none at all to start.","Thumbs up, arms about 45 degrees from the body, lift into a Y shape.","You want this low between the shoulder blades. Traps firing means too heavy."],n:"Prone Y raise",t1:"2 × 12–15",t2:"2 × 12–15",s1:2,s2:2,setup:["bench"],
         note:"Bench at 30, face down. Lower trapezius. Light is correct."},
-      {id:"b6",n:"EZ bar or cable curl",t1:"3 × 10–12",t2:"3 × 8–10",s1:3,s2:3,setup:["cable"],
+      {id:"b6",cues:["Elbows stay at the ribs. No swinging from the shoulder.","Cable keeps tension at the top, EZ bar allows more load. Either works.","Control the lowering. That is where most of the growth is."],n:"EZ bar or cable curl",t1:"3 × 10–12",t2:"3 × 8–10",s1:3,s2:3,setup:["cable"],
         note:"Your choice of implement."},
-      {id:"b7",n:"Half-kneeling Pallof press",t1:"3 × 10 / side",t2:"3 × 10 / side",s1:3,s2:3,setup:["cable"],side:true,bw:true,
+      {id:"b7",cues:["Mid pulley, D-handle, half kneeling with the inside knee down.","Set the ribs down and squeeze the down-side glute before you press.","Press straight out slowly, hold two seconds, return slowly.","The point is that nothing moves. If you are rotating, step closer to the stack."],n:"Half-kneeling Pallof press",t1:"3 × 10 / side",t2:"3 × 10 / side",s1:3,s2:3,setup:["cable"],side:true,bw:true,
         note:"Mid pulley, D-handle. Anti-rotation. Press out slow, hold two seconds, return slow."},
-      {id:"b8",n:"Chin tuck against wall",t1:"2 × 10 (5s holds)",t2:"2 × 10",s1:2,s2:2,setup:[],bw:true,
+      {id:"b8",cues:["Back of the head against a wall if you want the feedback.","The chin translates straight backward. It does not tilt down.","You should feel it at the front of the throat, not the back of the neck.","Five second holds, ten reps. Ninety seconds total."],n:"Chin tuck against wall",t1:"2 × 10 (5s holds)",t2:"2 × 10",s1:2,s2:2,setup:[],bw:true,
         note:"Deep neck flexors for forward head position. Ninety seconds well spent."}
     ],
     min:["b1","b2","b4","b7"]
@@ -295,30 +297,26 @@ const PLAN = {
 
   C:{ key:"C", name:"Push + Single Leg", sub:"Chest, shoulders, carries", color:"var(--C)",
     tips:[
-      {h:"Before you start", l:[
-        "Two minutes: band pull-aparts and a light set of everything you are about to press."]},
-      {h:"Cues", l:[
-        "Incline press: bench at 30. Shoulder blades retracted and down before the bar moves.",
-        "Bulgarian split squat: rear foot on the flat bench. Slow on the way down, this is where it works.",
-        "Landmine press is here instead of a strict overhead press. Better tolerated with rounded shoulders.",
-        "Suitcase carry: stand tall. If you are leaning, the weight is too heavy."]},
+      {h:"Warm-up, three minutes", l:[
+        "Band pull-aparts, then one light set of everything you are about to press.",
+        "A few bodyweight split squats before you load them."]},
       {h:"Watch", l:[
         "This is your second lower body day. If the split squats feel like a leg day on their own, that is correct."]}
     ],
     ex:[
-      {id:"c1",n:"Incline press",t1:"3 × 10",t2:"4 × 6–8",s1:3,s2:4,setup:["bench","bar"],
+      {id:"c1",cues:["Bench at 30. Steeper than that turns it into a shoulder press.","Shoulder blades retracted and down before the bar moves.","Feet planted, no arch beyond your natural curve.","Barbell or dumbbells both work, but stay with one for a full block so the numbers compare."],n:"Incline press",t1:"3 × 10",t2:"4 × 6–8",s1:3,s2:4,setup:["bench","bar"],
         note:"Bench at 30. Barbell or dumbbells, keep it consistent within a block."},
-      {id:"c2",n:"Flat dumbbell press or dips",t1:"3 × 10–12",t2:"3 × 8–12",s1:3,s2:3,setup:["bench"],
+      {id:"c2",cues:["Bench at 0 for the press. Wrists stacked over the elbows.","Dips: slight forward lean loads the chest, upright loads the triceps.","The dumbbells cannot be dropped, so leave a rep in reserve on the last set."],n:"Flat dumbbell press or dips",t1:"3 × 10–12",t2:"3 × 8–12",s1:3,s2:3,setup:["bench"],
         note:"Bench at 0 for the press. Dips on the rack attachment, slight forward lean for chest."},
-      {id:"c3",n:"Bulgarian split squat",t1:"3 × 8–10 / side",t2:"3 × 8–10 / side",s1:3,s2:3,setup:["bench"],side:true,
+      {id:"c3",cues:["Rear foot on the bench at 0. Laces down or toes tucked, whichever your ankle prefers.","Stand far enough out that the front shin is close to vertical at the bottom.","Three second descent. That is where the work happens.","Front knee over the toes, and keep the arch from collapsing inward."],n:"Bulgarian split squat",t1:"3 × 8–10 / side",t2:"3 × 8–10 / side",s1:3,s2:3,setup:["bench"],side:true,
         note:"Rear foot on the bench at 0. Three second descent."},
-      {id:"c4",n:"Landmine press",t1:"3 × 8–10 / side",t2:"3 × 8–10 / side",s1:3,s2:3,setup:[],side:true,
+      {id:"c4",cues:["Staggered stance with the opposite foot forward from the pressing arm.","Brace and squeeze the glutes. The torso should not lean back to help.","Press up and slightly across the body.","Free hand on the hip or out for balance, not gripping the rack."],n:"Landmine press",t1:"3 × 8–10 / side",t2:"3 × 8–10 / side",s1:3,s2:3,setup:[],side:true,
         note:"Staggered stance, braced. Press up and slightly across."},
-      {id:"c5",n:"Cable lateral raise",t1:"3 × 12–15 / side",t2:"3 × 12–15 / side",s1:3,s2:3,setup:["cable"],side:true,
+      {id:"c5",cues:["Low pulley with the cable running behind you and across the body.","Lead with the elbow, slight lean away from the stack.","Stop at shoulder height. Going higher hands the work to the traps."],n:"Cable lateral raise",t1:"3 × 12–15 / side",t2:"3 × 12–15 / side",s1:3,s2:3,setup:["cable"],side:true,
         note:"Low pulley, cable running across the body. Lead with the elbow."},
-      {id:"c6",n:"Cable triceps pushdown",t1:"3 × 10–12",t2:"3 × 10–12",s1:3,s2:3,setup:["cable"],
+      {id:"c6",cues:["High pulley. Elbows pinned at the ribs and staying there all set.","Full lockout, controlled return, no leaning into the bar."],n:"Cable triceps pushdown",t1:"3 × 10–12",t2:"3 × 10–12",s1:3,s2:3,setup:["cable"],
         note:"High pulley. Elbows pinned to the ribs."},
-      {id:"c7",n:"Suitcase carry",t1:"3 × 30–40 steps / side",t2:"3 × 40 steps / side",s1:3,s2:3,setup:[],unit:"steps",side:true,
+      {id:"c7",cues:["16 kg kettlebell in one hand, nothing in the other.","Stand tall with level shoulders. No lean in either direction.","Brace the side that is not holding the weight. That side is what you are training.","If you are leaning, it is too heavy. Heavier is not the goal here."],n:"Suitcase carry",t1:"3 × 30–40 steps / side",t2:"3 × 40 steps / side",s1:3,s2:3,setup:[],unit:"steps",side:true,
         note:"16 kg kettlebell. Stand tall, shoulders level, no lean. Anti-lateral-flexion under load."}
     ],
     min:["c1","c3","c4","c7"]
@@ -510,6 +508,7 @@ function actEx(id){ return S.active.ex.find(e => e.id === id); }
    RENDER
 --------------------------------------------------------------- */
 const open = {};
+const openC = {};
 function render(){
   document.documentElement.style.setProperty("--accent", PLAN[day].color);
   if(tab === "mobility") document.documentElement.style.setProperty("--accent", "var(--M)");
@@ -541,7 +540,7 @@ function viewToday(){
     <button class="m-min" data-mode="min" aria-pressed="${mode==="min"}">Minimum · 30 min</button>
   </div>`;
 
-  h += `<details class="tips"><summary>Setup and key points</summary><div class="tipbody">`;
+  h += `<details class="tips"><summary>Warm-up and session rules</summary><div class="tipbody">`;
   PLAN[day].tips.forEach(g => {
     h += `<h4>${esc(g.h)}</h4><ul>` + g.l.map(x => `<li>${esc(x)}</li>`).join("") + `</ul>`;
   });
@@ -566,9 +565,18 @@ function viewToday(){
       </button>
       <div class="ex-body">`;
 
+    const su = S.setups[e.id] || {};
+    const vals = [];
+    if(e.setup.includes("bench") && su.bench !== undefined && su.bench !== "") vals.push(su.bench + "°");
+    if(e.setup.includes("bar") && su.bar) vals.push("Bar " + su.bar);
+    if(e.setup.includes("cable") && su.cable) vals.push("Cable " + su.cable);
+
+    h += `<details class="excues" ${openC[e.id] ? "open" : ""} data-cues="${e.id}">
+      <summary><span>Setup and cues</span><span class="sumvals">${vals.join(" · ")}</span></summary>
+      <div class="inner">
+        <div class="note">${esc(e.note)}</div>`;
     if(e.setup.length){
       h += `<div class="setup">`;
-      const su = S.setups[e.id] || {};
       if(e.setup.includes("bench")){
         h += `<div class="chip"><span>Bench</span><select data-set="${e.id}" data-f="bench">
           <option value="">—</option>` +
@@ -583,8 +591,8 @@ function viewToday(){
       }
       h += `</div>`;
     }
-
-    h += `<div class="note">${esc(e.note)}</div>`;
+    h += `<ul class="cuelist">` + (e.cues || []).map(c => `<li>${esc(c)}</li>`).join("") + `</ul>
+      </div></details>`;
 
     if(last){
       h += `<div class="lastline">Last time: <b>${last.sets.map(s => (e.bw ? "" : s.w + " ") + "× " + s.r).join(", ")}</b> · ${fmtDate(last.date)}</div>`;
@@ -639,11 +647,22 @@ function wireToday(){
   v.querySelectorAll("[data-toggle]").forEach(b => b.onclick = () => {
     const id = b.dataset.toggle; open[id] = !open[id]; render();
   });
+  v.querySelectorAll("[data-cues]").forEach(d => d.addEventListener("toggle", () => {
+    openC[d.dataset.cues] = d.open;
+  }));
   v.querySelectorAll("[data-set]").forEach(el => el.onchange = () => {
     const id = el.dataset.set;
     S.setups[id] = S.setups[id] || {};
     S.setups[id][el.dataset.f] = el.value;
     save(); toast("Setup saved");
+    const d = v.querySelector(`[data-cues="${id}"] .sumvals`);
+    if(d){
+      const c = S.setups[id], out = [];
+      if(c.bench !== undefined && c.bench !== "") out.push(c.bench + "°");
+      if(c.bar) out.push("Bar " + c.bar);
+      if(c.cable) out.push("Cable " + c.cable);
+      d.textContent = out.join(" · ");
+    }
   });
   v.querySelectorAll("[data-add]").forEach(b => b.onclick = () => {
     const id = b.dataset.add, a = actEx(id);
