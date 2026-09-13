@@ -188,11 +188,14 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.9;st
 .tbtn.sec{color:var(--muted);font-weight:500}
 .cuetoggle{margin-bottom:13px}
 details.excues{background:var(--surface2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:14px;overflow:hidden}
-details.excues summary{padding:11px 13px;font-weight:600;font-size:14.5px;list-style:none;display:flex;align-items:center;gap:9px;cursor:pointer}
+details.excues summary{padding:11px 13px;font-weight:600;font-size:14.5px;list-style:none;display:flex;align-items:flex-start;gap:10px;cursor:pointer}
 details.excues summary::-webkit-details-marker{display:none}
-details.excues summary::after{content:"";flex:0 0 auto;width:7px;height:7px;border-right:2px solid var(--faint);border-bottom:2px solid var(--faint);transform:rotate(45deg) translateY(-2px);transition:transform .2s}
-details.excues[open] summary::after{transform:rotate(-135deg) translateY(-1px)}
-.sumvals{flex:1;text-align:right;font-size:13px;color:var(--muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+details.excues summary::after{content:"";flex:0 0 auto;margin-top:6px;width:7px;height:7px;border-right:2px solid var(--faint);border-bottom:2px solid var(--faint);transform:rotate(45deg);transition:transform .2s}
+details.excues[open] summary::after{transform:rotate(-135deg);margin-top:9px}
+.sumtext{flex:1;min-width:0}
+.sumnote{display:block;font-size:13.5px;color:var(--muted);font-weight:500;line-height:1.45;margin-top:3px}
+.elapsed{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);padding:12px 15px;margin:14px 0 4px;font-size:14px;color:var(--muted);font-weight:500}
+.elapsed b{font-size:19px;color:var(--ink);font-weight:600;letter-spacing:-.4px}
 .excues .inner{padding:0 13px 13px;border-top:1px solid var(--line);padding-top:12px}
 .excues .note{margin-bottom:12px}
 .excues .setup{margin-bottom:0}
@@ -271,11 +274,11 @@ const PLAN = {
         note:"Low pulley, rope, facing away. Hinge pattern with no spinal compression."},
       {id:"a5",cues:["Low pulley, ankle strap on the outside leg. Hold the rack lightly for balance.","Stand tall and keep the pelvis level. No leaning away from the stack.","Lift the leg out and slightly behind you, not forward.","Light. If the torso moves, the weight is doing the work instead of the glute."],n:"Cable hip abduction",t1:"3 × 12–15 / side",t2:"3 × 12–15 / side",s1:3,s2:3,setup:["cable"],side:true,
         note:"Low pulley, ankle strap. Glute medius. Stand tall, do not lean away from the stack."},
-      {id:"a6",cues:["Lower back pinned to the floor for the entire set. That is the whole exercise.","Exhale as the opposite arm and leg extend. Ribs stay down.","Extend only as far as you can hold the back flat, then shorten the range next rep.","Progress by slowing the tempo before you add a plate."],n:"Dead bug",t1:"3 × 8 / side",t2:"3 × 10 / side",s1:3,s2:3,setup:[],side:true,bw:true,
+      {id:"a6",cues:["Lower back pinned to the floor for the entire set. That is the whole exercise.","Exhale as the opposite arm and leg extend. Ribs stay down.","Extend only as far as you can hold the back flat, then shorten the range next rep.","Progress by slowing the tempo before you add a plate."],n:"Dead bug",t1:"3 × 8 / side",t2:"3 × 10 / side",s1:3,s2:3,setup:[],side:true,
         note:"Lower back pinned to the floor throughout. Slow. Progress by tempo, then by holding a light plate."},
       {id:"a7",timers:[{l:"20s",s:20},{l:"30s",s:30},{l:"45s",s:45}],cues:["Elbow directly under the shoulder. Hips stacked, not rolled backward.","Push the bottom shoulder away from your ear so you are not hanging on the joint.","Raise the top leg without letting the hips drop or rotate.","Drop to the knee for a shorter lever if the hips start sagging."],n:"Side plank + top-leg raise",t1:"2 × 20–30s / side",t2:"3 × 30–45s / side",s1:2,s2:3,setup:[],unit:"sec",side:true,bw:true,
         note:"Hips stacked. Do not sag or rotate backward. Anti-lateral-flexion plus glute medius."},
-      {id:"a8",cues:["Barefoot for both. Pause at the top of every rep.","Calf raises off a plate edge so you get the stretch at the bottom.","Tibialis raises with heels against the wall, toes pulling up toward the shins.","Burning is expected. These are small muscles and they fatigue fast."],n:"Calf raise + tibialis raise",t1:"2 × 15–20 each",t2:"2 × 15–20 each",s1:2,s2:2,setup:[],bw:true,
+      {id:"a8",cues:["Barefoot for both. Pause at the top of every rep.","Calf raises off a plate edge so you get the stretch at the bottom.","Tibialis raises with heels against the wall, toes pulling up toward the shins.","Burning is expected. These are small muscles and they fatigue fast."],n:"Calf raise + tibialis raise",t1:"2 × 15–20 each",t2:"2 × 15–20 each",s1:2,s2:2,setup:[],
         note:"Barefoot, full range on both. Foot and ankle work for the arch."}
     ],
     min:["a1","a2","a4","a6","a7"]
@@ -302,7 +305,7 @@ const PLAN = {
         note:"Bench at 30, face down. Lower trapezius. Light is correct."},
       {id:"b6",cues:["Elbows stay at the ribs. No swinging from the shoulder.","Cable keeps tension at the top, EZ bar allows more load. Either works.","Control the lowering. That is where most of the growth is."],n:"EZ bar or cable curl",t1:"3 × 10–12",t2:"3 × 8–10",s1:3,s2:3,setup:["cable"],
         note:"Your choice of implement."},
-      {id:"b7",cues:["Mid pulley, D-handle, half kneeling with the inside knee down.","Set the ribs down and squeeze the down-side glute before you press.","Press straight out slowly, hold two seconds, return slowly.","The point is that nothing moves. If you are rotating, step closer to the stack."],n:"Half-kneeling Pallof press",t1:"3 × 10 / side",t2:"3 × 10 / side",s1:3,s2:3,setup:["cable"],side:true,bw:true,
+      {id:"b7",cues:["Mid pulley, D-handle, half kneeling with the inside knee down.","Set the ribs down and squeeze the down-side glute before you press.","Press straight out slowly, hold two seconds, return slowly.","The point is that nothing moves. If you are rotating, step closer to the stack."],n:"Half-kneeling Pallof press",t1:"3 × 10 / side",t2:"3 × 10 / side",s1:3,s2:3,setup:["cable"],side:true,
         note:"Mid pulley, D-handle. Anti-rotation. Press out slow, hold two seconds, return slow."},
       {id:"b8",cues:["Back of the head against a wall if you want the feedback.","The chin translates straight backward. It does not tilt down.","You should feel it at the front of the throat, not the back of the neck.","Five second holds, ten reps. Ninety seconds total."],n:"Chin tuck against wall",t1:"2 × 10 (5s holds)",t2:"2 × 10",s1:2,s2:2,setup:[],bw:true,
         note:"Deep neck flexors for forward head position. Ninety seconds well spent."}
@@ -602,7 +605,7 @@ function viewToday(){
     if(e.timers) h += timerHTML("ex_" + e.id, e.timers);
 
     h += `<details class="excues cuetoggle" ${openC[e.id] ? "open" : ""} data-cues="${e.id}">
-      <summary><span>Cues</span><span class="sumvals">${esc(e.note)}</span></summary>
+      <summary><span class="sumtext">Cues<span class="sumnote">${esc(e.note)}</span></span></summary>
       <div class="inner">
         <ul class="cuelist" style="margin-top:0">` + (e.cues || []).map(c => `<li>${esc(c)}</li>`).join("") + `</ul>
       </div></details>`;
@@ -634,6 +637,9 @@ function viewToday(){
     h += `</div></article>`;
   });
 
+  if(S.active.firstLogAt){
+    h += `<div class="elapsed"><span>Session time</span><b data-elapsed>${mmss(Math.floor((Date.now() - S.active.firstLogAt)/1000))}</b></div>`;
+  }
   h += `<button class="finish" id="finish" ${logged ? "" : "disabled"}>
     ${logged ? `Finish session · ${logged} of ${list.length} logged` : "Log a set to finish"}</button>`;
   if(logged) h += `<button class="ghost danger" id="scrap">Discard this session</button>`;
@@ -675,6 +681,7 @@ function wireToday(){
     const last = lastFor(id);
     const seed = prev ? { w:prev.w, r:prev.r }
       : last ? { w:last.sets[0].w, r:last.sets[0].r } : { w:0, r:0 };
+    if(!S.active.firstLogAt) S.active.firstLogAt = Date.now();
     a.sets.push(seed); save(); open[id] = true; render();
   });
   v.querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
@@ -697,20 +704,35 @@ function wireToday(){
     if(inp) inp.value = a.sets[i][f];
   });
   wireTimers(v);
+  startElapsed();
   const fin = document.getElementById("finish");
   if(fin) fin.onclick = finish;
   const sc = document.getElementById("scrap");
   if(sc) sc.onclick = () => { if(confirm("Discard all sets in this session?")){ S.active = null; save(); render(); } };
 }
 
+let elapsedT = null;
+function startElapsed(){
+  if(elapsedT) clearInterval(elapsedT);
+  elapsedT = setInterval(() => {
+    const n = document.querySelector("[data-elapsed]");
+    if(!n || !S.active || !S.active.firstLogAt){ clearInterval(elapsedT); elapsedT = null; return; }
+    n.textContent = mmss(Math.floor((Date.now() - S.active.firstLogAt)/1000));
+  }, 1000);
+}
+
 function finish(){
   const a = S.active;
   const kept = a.ex.filter(e => e.sets.length);
   if(!kept.length) return;
+  const startMs = a.firstLogAt || a.started;
   S.sessions.push({
-    date:new Date().toISOString(), day:a.day, mode:a.mode,
+    date:new Date().toISOString(),
+    start:new Date(startMs).toISOString(),
+    end:new Date().toISOString(),
+    day:a.day, mode:a.mode,
     week:weekNum(), phase:phaseNum(),
-    mins:Math.max(1, Math.round((Date.now() - a.started) / 60000)),
+    mins:Math.max(1, Math.round((Date.now() - startMs) / 60000)),
     ex:kept.map(e => ({ id:e.id, name:e.name, sets:e.sets.map(s => ({ w:+s.w, r:+s.r })) }))
   });
   S.active = null; save();
@@ -896,7 +918,7 @@ function viewHistory(){
           ${s.mode === "min" ? '<span class="tag min">Minimum</span>' : ""}</div>
         <div class="hdate">${fmtDate(s.date)}</div>
       </div>
-      <div class="hdate" style="margin-top:2px">Week ${s.week} · ${s.mins} min · ${s.ex.length} exercises</div>
+      <div class="hdate" style="margin-top:2px">Week ${s.week} · ${s.mins} min${s.start ? " · started " + new Date(s.start).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}) : ""} · ${s.ex.length} exercises</div>
       <div class="hsets">` + s.ex.map(e => `
         <div><span>${esc(e.name)}</span><span>${e.sets.map(st => (st.w ? st.w + "×" : "") + st.r).join("  ")}</span></div>`).join("") + `
       </div>
@@ -1018,11 +1040,13 @@ function viewSetup(){
 }
 
 function rows(){
-  const out = [["date","week","phase","day","mode","exercise","set","weight","unit","reps","bench","bar_height","cable_height"]];
+  const out = [["session_start","session_end","session_minutes","week","phase","day","mode",
+    "exercise","set","weight","unit","reps","bench","bar_height","cable_height"]];
+  const fmt = v => v ? new Date(v).toISOString().slice(0,19).replace("T"," ") : "";
   S.sessions.forEach(s => s.ex.forEach(e => {
     const su = S.setups[e.id] || {};
     e.sets.forEach((st, i) => out.push([
-      new Date(s.date).toISOString().slice(0,19).replace("T"," "),
+      fmt(s.start || s.date), fmt(s.end || s.date), s.mins,
       s.week, s.phase, s.day, s.mode, e.name, i+1, st.w, S.settings.unit, st.r,
       su.bench ?? "", su.bar ?? "", su.cable ?? ""
     ]));
